@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:netflix_clone/search.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -108,12 +109,27 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget searchContent() {
-    return const Center(
-      child: Text(
-        "Search Page Coming Soon",
-        style: TextStyle(color: Colors.white, fontSize: 18),
-      ),
-    );
+    final Map<String, String> movies = {
+      // Trending
+      "Inception": trending[0],
+      "The Dark Knight": trending[1],
+      "Interstellar": trending[2],
+      "Avatar": trending[3],
+
+      // Top Rated
+      "The Godfather": topRated[0],
+      "Pulp Fiction": topRated[1],
+      "Shawshank Redemption": topRated[2],
+      "Fight Club": topRated[3],
+
+      // My List
+      "The Matrix": myList[0],
+      "Gladiator": myList[1],
+      "Forrest Gump": myList[2],
+      "The Lion King": myList[3],
+    };
+
+    return SearchPage(movies: movies);
   }
 
   Widget accountContent() {
