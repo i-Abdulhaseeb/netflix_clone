@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  int _currentIndex = 0;
 
   final List<String> trending = const [
     "https://media.themoviedb.org/t/p/w600_and_h900_bestv2/ljsZTbVsrQSqZgWeep2B1QiDKuh.jpg", // Inception
@@ -70,8 +77,62 @@ class HomePage extends StatelessWidget {
     );
   }
 
+  Widget homeContent() {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          SizedBox(
+            height: 250,
+            child: Image.network(
+              "https://image.tmdb.org/t/p/w500/6FfCtAuVAW8XJjZ7eWeLibRLWTw.jpg", // Star Wars
+              fit: BoxFit.cover,
+              width: double.infinity,
+              errorBuilder: (context, error, stackTrace) => Container(
+                color: Colors.grey[900],
+                child: const Center(
+                  child: Icon(
+                    Icons.broken_image,
+                    color: Colors.white,
+                    size: 48,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          buildSection("Trending Now", trending),
+          buildSection("Top Rated", topRated),
+          buildSection("My List", myList),
+        ],
+      ),
+    );
+  }
+
+  Widget searchContent() {
+    return const Center(
+      child: Text(
+        "Search Page Coming Soon",
+        style: TextStyle(color: Colors.white, fontSize: 18),
+      ),
+    );
+  }
+
+  Widget accountContent() {
+    return const Center(
+      child: Text(
+        "Account Page Coming Soon",
+        style: TextStyle(color: Colors.white, fontSize: 18),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final List<Widget> pages = [
+      homeContent(),
+      searchContent(),
+      accountContent(),
+    ];
+
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
@@ -101,32 +162,22 @@ class HomePage extends StatelessWidget {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            SizedBox(
-              height: 250,
-              child: Image.network(
-                "https://image.tmdb.org/t/p/w500/6FfCtAuVAW8XJjZ7eWeLibRLWTw.jpg", // Star Wars
-                fit: BoxFit.cover,
-                width: double.infinity,
-                errorBuilder: (context, error, stackTrace) => Container(
-                  color: Colors.grey[900],
-                  child: const Center(
-                    child: Icon(
-                      Icons.broken_image,
-                      color: Colors.white,
-                      size: 48,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            buildSection("Trending Now", trending),
-            buildSection("Top Rated", topRated),
-            buildSection("My List", myList),
-          ],
-        ),
+      body: pages[_currentIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.black,
+        selectedItemColor: Colors.red[600],
+        unselectedItemColor: Colors.white70,
+        currentIndex: _currentIndex,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+          BottomNavigationBarItem(icon: Icon(Icons.search), label: "Search"),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Account"),
+        ],
       ),
     );
   }
