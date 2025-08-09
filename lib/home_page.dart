@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:netflix_clone/search.dart';
+import 'package:netflix_clone/account_page.dart';
+import 'package:netflix_clone/my_list_manager.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -11,28 +13,69 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
 
-  final List<String> trending = const [
-    "https://media.themoviedb.org/t/p/w600_and_h900_bestv2/ljsZTbVsrQSqZgWeep2B1QiDKuh.jpg", // Inception
-    "https://image.tmdb.org/t/p/w500/1hRoyzDtpgMU7Dz4JF22RANzQO7.jpg", // The Dark Knight
-    "https://image.tmdb.org/t/p/w500/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg", // Interstellar
-    "https://image.tmdb.org/t/p/w500/6EiRUJpuoeQPghrs3YNktfnqOVh.jpg", // Avatar
+  final List<Map<String, String>> trending = [
+    {
+      "title": "Dune",
+      "imageUrl":
+          "https://media.themoviedb.org/t/p/w600_and_h900_bestv2/ljsZTbVsrQSqZgWeep2B1QiDKuh.jpg",
+    },
+    {
+      "title": "The Dark Knight",
+      "imageUrl":
+          "https://image.tmdb.org/t/p/w500/1hRoyzDtpgMU7Dz4JF22RANzQO7.jpg",
+    },
+    {
+      "title": "Interstellar",
+      "imageUrl":
+          "https://image.tmdb.org/t/p/w500/rAiYTfKGqDCRIIqo664sY9XZIvQ.jpg",
+    },
+    {
+      "title": "Avatar",
+      "imageUrl":
+          "https://image.tmdb.org/t/p/w500/6EiRUJpuoeQPghrs3YNktfnqOVh.jpg",
+    },
   ];
 
-  final List<String> topRated = const [
-    "https://image.tmdb.org/t/p/w500/3bhkrj58Vtu7enYsRolD1fZdja1.jpg", // The Godfather
-    "https://image.tmdb.org/t/p/w500/d5iIlFn5s0ImszYzBPb8JPIfbXD.jpg", // Pulp Fiction
-    "https://image.tmdb.org/t/p/w500/q6y0Go1tsGEsmtFryDOJo3dEmqu.jpg", // Shawshank Redemption
-    "https://image.tmdb.org/t/p/w500/bptfVGEQuv6vDTIMVCHjJ9Dz8PX.jpg", // Fight Club
+  final List<Map<String, String>> topRated = [
+    {
+      "title": "The Godfather",
+      "imageUrl":
+          "https://image.tmdb.org/t/p/w500/3bhkrj58Vtu7enYsRolD1fZdja1.jpg",
+    },
+    {
+      "title": "Pulp Fiction",
+      "imageUrl":
+          "https://image.tmdb.org/t/p/w500/d5iIlFn5s0ImszYzBPb8JPIfbXD.jpg",
+    },
+    {
+      "title": "Shawshank Redemption",
+      "imageUrl":
+          "https://image.tmdb.org/t/p/w500/q6y0Go1tsGEsmtFryDOJo3dEmqu.jpg",
+    },
+    {
+      "title": "Fight Club",
+      "imageUrl":
+          "https://image.tmdb.org/t/p/w500/bptfVGEQuv6vDTIMVCHjJ9Dz8PX.jpg",
+    },
   ];
 
-  final List<String> myList = const [
-    "https://image.tmdb.org/t/p/w500/f89U3ADr1oiB1s9GkdPOEpXUk5H.jpg", // The Matrix
-    "https://image.tmdb.org/t/p/w500/ty8TGRuvJLPUmAR1H1nRIsgwvim.jpg", // Gladiator
-    "https://image.tmdb.org/t/p/w500/saHP97rTPS5eLmrLQEcANmKrsFl.jpg", // Forrest Gump
-    "https://image.tmdb.org/t/p/w500/sKCr78MXSLixwmZ8DyJLrpMsd15.jpg", // The Lion King
-  ];
+  void toggleMyList(String title, String imageUrl) {
+    setState(() {
+      if (MyListManager.myList.any((item) => item["imageUrl"] == imageUrl)) {
+        MyListManager.removeFromList(imageUrl);
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text("Removed from My List")));
+      } else {
+        MyListManager.addToList(title, imageUrl);
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text("Added to My List")));
+      }
+    });
+  }
 
-  Widget buildSection(String title, List<String> images) {
+  Widget buildSection(String title, List<Map<String, String>> movies) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -51,24 +94,47 @@ class _HomePageState extends State<HomePage> {
           height: 180,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            itemCount: images.length,
+            itemCount: movies.length,
             itemBuilder: (context, index) {
+              final movie = movies[index];
+              final isInList = MyListManager.myList.any(
+                (item) => item["imageUrl"] == movie["imageUrl"],
+              );
+
               return Container(
                 margin: const EdgeInsets.symmetric(horizontal: 6),
                 width: 120,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(6),
-                  child: Image.network(
-                    images[index],
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Container(
-                      color: Colors.grey[800],
-                      child: const Icon(
-                        Icons.broken_image,
-                        color: Colors.white,
+                child: Stack(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(6),
+                      child: Image.network(
+                        movie["imageUrl"]!,
+                        fit: BoxFit.cover,
+                        width: 120,
+                        height: 180,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          color: Colors.grey[800],
+                          child: const Icon(
+                            Icons.broken_image,
+                            color: Colors.white,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
+                    Positioned(
+                      top: 5,
+                      right: 5,
+                      child: IconButton(
+                        icon: Icon(
+                          isInList ? Icons.check_circle : Icons.add_circle,
+                          color: isInList ? Colors.green : Colors.white,
+                        ),
+                        onPressed: () =>
+                            toggleMyList(movie["title"]!, movie["imageUrl"]!),
+                      ),
+                    ),
+                  ],
                 ),
               );
             },
@@ -85,7 +151,7 @@ class _HomePageState extends State<HomePage> {
           SizedBox(
             height: 250,
             child: Image.network(
-              "https://image.tmdb.org/t/p/w500/6FfCtAuVAW8XJjZ7eWeLibRLWTw.jpg", // Star Wars
+              "https://image.tmdb.org/t/p/w500/6FfCtAuVAW8XJjZ7eWeLibRLWTw.jpg",
               fit: BoxFit.cover,
               width: double.infinity,
               errorBuilder: (context, error, stackTrace) => Container(
@@ -102,7 +168,8 @@ class _HomePageState extends State<HomePage> {
           ),
           buildSection("Trending Now", trending),
           buildSection("Top Rated", topRated),
-          buildSection("My List", myList),
+          if (MyListManager.myList.isNotEmpty)
+            buildSection("My List", MyListManager.myList),
         ],
       ),
     );
@@ -110,35 +177,17 @@ class _HomePageState extends State<HomePage> {
 
   Widget searchContent() {
     final Map<String, String> movies = {
-      // Trending
-      "Inception": trending[0],
-      "The Dark Knight": trending[1],
-      "Interstellar": trending[2],
-      "Avatar": trending[3],
-
-      // Top Rated
-      "The Godfather": topRated[0],
-      "Pulp Fiction": topRated[1],
-      "Shawshank Redemption": topRated[2],
-      "Fight Club": topRated[3],
-
-      // My List
-      "The Matrix": myList[0],
-      "Gladiator": myList[1],
-      "Forrest Gump": myList[2],
-      "The Lion King": myList[3],
+      for (var movie in trending) movie["title"]!: movie["imageUrl"]!,
+      for (var movie in topRated) movie["title"]!: movie["imageUrl"]!,
+      for (var movie in MyListManager.myList)
+        movie["title"]!: movie["imageUrl"]!,
     };
 
     return SearchPage(movies: movies);
   }
 
   Widget accountContent() {
-    return const Center(
-      child: Text(
-        "Account Page Coming Soon",
-        style: TextStyle(color: Colors.white, fontSize: 18),
-      ),
-    );
+    return AccountPage(myList: MyListManager.myList);
   }
 
   @override

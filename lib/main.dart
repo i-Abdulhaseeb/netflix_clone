@@ -11,11 +11,9 @@ class NetflixCloneApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false, // hide debug banner
+      debugShowCheckedModeBanner: false,
       title: 'Netflix Clone',
-      theme: ThemeData(
-        fontFamily: 'Roboto', // optional for a clean look
-      ),
+      theme: ThemeData(fontFamily: 'Roboto'),
       home: const LoginPage(),
     );
   }
